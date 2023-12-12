@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Log represents a log
 type Log struct {
 	ID        uuid.UUID  `json:"id"`
 	SystemID  uuid.UUID  `json:"system_id"`
@@ -16,6 +17,24 @@ type Log struct {
 	Message   string     `json:"message"`
 	TimeStamp *time.Time `json:"time_stamp"`
 	UserID    uuid.UUID  `json:"user_id"`
+}
+
+// New creates a new Log
+func New(systemID uuid.UUID, level string, status string, message string, timeStamp *time.Time, userID uuid.UUID) (*Log, error) {
+	log := Log{
+		ID:        uuid.New(),
+		SystemID:  systemID,
+		Level:     level,
+		Status:    status,
+		Message:   message,
+		TimeStamp: timeStamp,
+		UserID:    userID,
+	}
+	err := log.IsValid()
+	if err != nil {
+		return nil, err
+	}
+	return &log, nil
 }
 
 var (
@@ -51,6 +70,7 @@ func isValidLogStatus(status string) bool {
 	return ok
 }
 
+// IsValid checks if the log is valid. If the log is not valid, it returns an error specifying the invalidation.
 func (l Log) IsValid() error {
 	_, err := uuid.Parse(l.ID.String())
 	if err != nil {
