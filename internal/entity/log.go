@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrInvalidLogLevel  = errors.New("invalid log level")
+	ErrInvalidLogStatus = errors.New("invalid log status")
 	ErrMessageRequired  = errors.New("message is required")
 	ErrInvalidTimeStamp = errors.New("invalid time stamp")
 )
@@ -34,16 +35,16 @@ var validLogStatus = map[string]bool{
 // Log represents a log
 type Log struct {
 	ID        uuid.UUID  `json:"id"`
-	SystemID  uuid.UUID  `json:"system_id"`
+	SystemID  string     `json:"system_id"`
 	Level     string     `json:"level"`
 	Status    string     `json:"status"`
 	Message   string     `json:"message"`
 	TimeStamp *time.Time `json:"time_stamp"`
-	UserID    uuid.UUID  `json:"user_id"`
+	UserID    string     `json:"user_id"`
 }
 
 // New creates a new Log
-func New(systemID uuid.UUID, level string, status string, message string, timeStamp *time.Time, userID uuid.UUID) (*Log, error) {
+func New(systemID, level, status, message string, timeStamp *time.Time, userID string) (*Log, error) {
 	log := Log{
 		ID:        uuid.New(),
 		SystemID:  systemID,
@@ -66,7 +67,7 @@ func (l Log) Validate() error {
 	if err != nil {
 		return err
 	}
-	_, err = uuid.Parse(l.SystemID.String())
+	_, err = uuid.Parse(l.SystemID)
 	if err != nil {
 		return err
 	}
@@ -76,7 +77,7 @@ func (l Log) Validate() error {
 	}
 
 	if !isValidLogStatus(l.Status) {
-		return ErrInvalidLogLevel
+		return ErrInvalidLogStatus
 	}
 
 	if l.Message == "" {
@@ -87,7 +88,7 @@ func (l Log) Validate() error {
 		return ErrInvalidTimeStamp
 	}
 
-	_, err = uuid.Parse(l.UserID.String())
+	_, err = uuid.Parse(l.UserID)
 	if err != nil {
 		return err
 	}
