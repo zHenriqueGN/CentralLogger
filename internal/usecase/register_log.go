@@ -3,22 +3,21 @@ package usecase
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/zHenriqueGN/CentralLogger/internal/entity"
 	"github.com/zHenriqueGN/CentralLogger/internal/infra/repository"
 )
 
 type RegisterLogUseCaseInputDTO struct {
-	SystemID  string
-	Level     string
-	Status    string
-	Message   string
-	TimeStamp *time.Time
-	UserID    string
+	SystemID  string     `json:"system_id"`
+	Level     string     `json:"level"`
+	Status    string     `json:"status"`
+	Message   string     `json:"message"`
+	TimeStamp *time.Time `json:"time_stamp"`
+	UserID    string     `json:"user_id"`
 }
 
 type RegisterLogUseCaseOutputDTO struct {
-	ID        uuid.UUID  `json:"id"`
+	ID        string     `json:"id"`
 	SystemID  string     `json:"system_id"`
 	Level     string     `json:"level"`
 	Status    string     `json:"status"`
@@ -40,16 +39,12 @@ func (r *RegisterLogUseCase) Execute(input RegisterLogUseCaseInputDTO) (*Registe
 	if err != nil {
 		return nil, err
 	}
-	err = log.Validate()
-	if err != nil {
-		return nil, err
-	}
 	err = r.LogRepository.Save(log)
 	if err != nil {
 		return nil, err
 	}
 	output := RegisterLogUseCaseOutputDTO{
-		ID:        log.ID,
+		ID:        log.ID.String(),
 		SystemID:  log.SystemID,
 		Level:     log.Level,
 		Status:    log.Status,
