@@ -34,13 +34,13 @@ var validLogStatus = map[string]bool{
 
 // Log represents a log
 type Log struct {
-	ID        uuid.UUID  `json:"id"`
-	SystemID  string     `json:"system_id"`
-	Level     string     `json:"level"`
-	Status    string     `json:"status"`
-	Message   string     `json:"message"`
-	TimeStamp *time.Time `json:"time_stamp"`
-	UserID    string     `json:"user_id"`
+	ID        uuid.UUID
+	SystemID  string
+	Level     string
+	Status    string
+	Message   string
+	TimeStamp *time.Time
+	UserID    string
 }
 
 // NewLog creates a new Log
