@@ -43,8 +43,8 @@ type Log struct {
 	UserID    string     `json:"user_id"`
 }
 
-// New creates a new Log
-func New(systemID, level, status, message string, timeStamp *time.Time, userID string) (*Log, error) {
+// NewLog creates a new Log
+func NewLog(systemID, level, status, message string, timeStamp *time.Time, userID string) (*Log, error) {
 	log := Log{
 		ID:        uuid.New(),
 		SystemID:  systemID,
