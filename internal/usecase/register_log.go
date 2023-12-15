@@ -15,7 +15,6 @@ type RegisterLogUseCaseInputDTO struct {
 	Status    string     `json:"status"`
 	Message   string     `json:"message"`
 	TimeStamp *time.Time `json:"time_stamp"`
-	UserID    string     `json:"user_id"`
 }
 
 type RegisterLogUseCaseOutputDTO struct {
@@ -25,7 +24,6 @@ type RegisterLogUseCaseOutputDTO struct {
 	Status    string     `json:"status"`
 	Message   string     `json:"message"`
 	TimeStamp *time.Time `json:"time_stamp"`
-	UserID    string     `json:"user_id"`
 }
 
 type RegisterLogUseCase struct {
@@ -37,7 +35,7 @@ func NewRegisterLogUseCase(uow uow.UowInterface) *RegisterLogUseCase {
 }
 
 func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCaseInputDTO) (*RegisterLogUseCaseOutputDTO, error) {
-	log, err := entity.NewLog(input.SystemID, input.Level, input.Status, input.Message, input.TimeStamp, input.UserID)
+	log, err := entity.NewLog(input.SystemID, input.Level, input.Status, input.Message, input.TimeStamp)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +54,6 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 		Status:    log.Status,
 		Message:   log.Message,
 		TimeStamp: log.TimeStamp,
-		UserID:    log.UserID,
 	}
 	return &output, nil
 }

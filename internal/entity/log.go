@@ -40,11 +40,10 @@ type Log struct {
 	Status    string
 	Message   string
 	TimeStamp *time.Time
-	UserID    string
 }
 
 // NewLog creates a new Log
-func NewLog(systemID, level, status, message string, timeStamp *time.Time, userID string) (*Log, error) {
+func NewLog(systemID, level, status, message string, timeStamp *time.Time) (*Log, error) {
 	log := Log{
 		ID:        uuid.New(),
 		SystemID:  systemID,
@@ -52,7 +51,6 @@ func NewLog(systemID, level, status, message string, timeStamp *time.Time, userI
 		Status:    status,
 		Message:   message,
 		TimeStamp: timeStamp,
-		UserID:    userID,
 	}
 	err := log.Validate()
 	if err != nil {
@@ -88,10 +86,6 @@ func (l Log) Validate() error {
 		return ErrInvalidTimeStamp
 	}
 
-	_, err = uuid.Parse(l.UserID)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
