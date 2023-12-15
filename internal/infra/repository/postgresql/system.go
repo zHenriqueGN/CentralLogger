@@ -11,6 +11,10 @@ type SystemRepository struct {
 	dbtx uow.DBTX
 }
 
+func NewSystemRepository(dbtx uow.DBTX) *SystemRepository {
+	return &SystemRepository{dbtx: dbtx}
+}
+
 func (s *SystemRepository) Create(ctx context.Context, system *entity.System) error {
 	stmt, err := s.dbtx.PrepareContext(ctx, "INSERT INTO systems (id, name, description, version) VALUES ($1, $2, $3, $4)")
 	if err != nil {
