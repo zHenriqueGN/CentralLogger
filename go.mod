@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/google/uuid v1.4.0
 	github.com/stretchr/testify v1.8.4
+	github.com/zHenriqueGN/UnitOfWork v0.0.0-20231205170726-4a46d541963f
 )
 
 require (
