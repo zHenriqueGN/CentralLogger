@@ -1,10 +1,12 @@
 package usecase
 
 import (
+	"context"
 	"time"
 
 	"github.com/zHenriqueGN/CentralLogger/internal/entity"
 	"github.com/zHenriqueGN/CentralLogger/internal/infra/repository"
+	"github.com/zHenriqueGN/UnitOfWork/uow"
 )
 
 type RegisterLogUseCaseInputDTO struct {
@@ -27,19 +29,23 @@ type RegisterLogUseCaseOutputDTO struct {
 }
 
 type RegisterLogUseCase struct {
-	LogRepository repository.LogRepositoryInterface
+	Uow uow.UowInterface
 }
 
-func NewRegisterLogUseCase(logRepository repository.LogRepositoryInterface) *RegisterLogUseCase {
-	return &RegisterLogUseCase{LogRepository: logRepository}
+func NewRegisterLogUseCase(uow uow.UowInterface) *RegisterLogUseCase {
+	return &RegisterLogUseCase{Uow: uow}
 }
 
-func (r *RegisterLogUseCase) Execute(input RegisterLogUseCaseInputDTO) (*RegisterLogUseCaseOutputDTO, error) {
+func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCaseInputDTO) (*RegisterLogUseCaseOutputDTO, error) {
 	log, err := entity.NewLog(input.SystemID, input.Level, input.Status, input.Message, input.TimeStamp, input.UserID)
 	if err != nil {
 		return nil, err
 	}
-	err = r.LogRepository.Save(log)
+	logRepository, err := r.getLogRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = logRepository.Save(log)
 	if err != nil {
 		return nil, err
 	}
@@ -53,4 +59,12 @@ func (r *RegisterLogUseCase) Execute(input RegisterLogUseCaseInputDTO) (*Registe
 		UserID:    log.UserID,
 	}
 	return &output, nil
+}
+
+func (r *RegisterLogUseCase) getLogRepository(ctx context.Context) (repository.LogRepositoryInterface, error) {
+	repo, err := r.Uow.GetRepository(ctx, "LogRepository")
+	if err != nil {
+		return nil, err
+	}
+	return repo.(repository.LogRepositoryInterface), nil
 }
