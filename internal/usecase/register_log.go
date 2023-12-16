@@ -48,7 +48,7 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 		return nil, err
 	}
 	output := RegisterLogUseCaseOutputDTO{
-		ID:        log.ID.String(),
+		ID:        log.ID,
 		SystemID:  log.SystemID,
 		Level:     log.Level,
 		Status:    log.Status,

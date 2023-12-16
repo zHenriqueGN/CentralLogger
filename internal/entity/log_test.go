@@ -47,7 +47,7 @@ func TestGivenValidFields_WhenCreatingANewLog_ThenShouldReceiveTheLog(t *testing
 	log, err := NewLog(uuid.New().String(), "DEBUG", "SUCCESS", "MESSAGE", &currentTime)
 	assert.Nil(t, err)
 	assert.NotNil(t, log)
-	assert.Len(t, log.ID.String(), 36)
+	assert.Len(t, log.ID, 36)
 	assert.Equal(t, log.Level, "DEBUG")
 	assert.Equal(t, log.Status, "SUCCESS")
 	assert.Equal(t, log.Message, "MESSAGE")

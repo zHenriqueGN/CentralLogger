@@ -43,7 +43,7 @@ func (r *RegisterSystemUseCase) Execute(ctx context.Context, input RegisterSyste
 		return nil, err
 	}
 	output := RegisterSystemUseCaseOutputDTO{
-		ID:          system.ID.String(),
+		ID:          system.ID,
 		Name:        system.Name,
 		Description: system.Description,
 		Version:     system.Version,

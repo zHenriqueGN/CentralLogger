@@ -34,7 +34,7 @@ var validLogStatus = map[string]bool{
 
 // Log represents a log
 type Log struct {
-	ID        uuid.UUID
+	ID        string
 	SystemID  string
 	Level     string
 	Status    string
@@ -45,7 +45,7 @@ type Log struct {
 // NewLog creates a new Log
 func NewLog(systemID, level, status, message string, timeStamp *time.Time) (*Log, error) {
 	log := Log{
-		ID:        uuid.New(),
+		ID:        uuid.New().String(),
 		SystemID:  systemID,
 		Level:     level,
 		Status:    status,
@@ -61,7 +61,7 @@ func NewLog(systemID, level, status, message string, timeStamp *time.Time) (*Log
 
 // Validate checks if the log is valid. If the log is not valid, it returns an error specifying the invalidation.
 func (l Log) Validate() error {
-	_, err := uuid.Parse(l.ID.String())
+	_, err := uuid.Parse(l.ID)
 	if err != nil {
 		return err
 	}
