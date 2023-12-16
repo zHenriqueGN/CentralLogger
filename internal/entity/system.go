@@ -14,7 +14,7 @@ var (
 
 // System represents a system that generates logs
 type System struct {
-	ID          uuid.UUID
+	ID          string
 	Name        string
 	Description string
 	Version     string
@@ -23,7 +23,7 @@ type System struct {
 // NewSystem creates a new System
 func NewSystem(name, description, version string) (*System, error) {
 	system := System{
-		ID:          uuid.New(),
+		ID:          uuid.New().String(),
 		Name:        name,
 		Description: description,
 		Version:     version,
@@ -37,7 +37,7 @@ func NewSystem(name, description, version string) (*System, error) {
 
 // Validate checks if the log is valid. If the log is not valid, it returns an error specifying the invalidation.
 func (s *System) Validate() error {
-	_, err := uuid.Parse(s.ID.String())
+	_, err := uuid.Parse(s.ID)
 	if err != nil {
 		return err
 	}
