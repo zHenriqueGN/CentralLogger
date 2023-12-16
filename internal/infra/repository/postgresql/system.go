@@ -21,7 +21,7 @@ func (s *SystemRepository) Create(ctx context.Context, system *entity.System) er
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.ExecContext(ctx, system.ID.String(), system.Name, system.Description, system.Version)
+	_, err = stmt.ExecContext(ctx, system.ID, system.Name, system.Description, system.Version)
 	if err != nil {
 		return err
 	}
