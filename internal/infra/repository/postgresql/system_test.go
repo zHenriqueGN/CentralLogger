@@ -35,7 +35,7 @@ func (suite *SystemRepositoryTestSuite) TearDownTest() {
 	suite.db.Close()
 }
 
-func (suite *SystemRepositoryTestSuite) TestGivenAValidSystem_WhenSavingTheSystem_ShouldReceiveNil() {
+func (suite *SystemRepositoryTestSuite) TestGivenAValidSystem_WhenCreatingTheSystem_ShouldCreateTheSystemCorrectly() {
 	systemRepository := NewSystemRepository(suite.db)
 	err := systemRepository.Create(context.Background(), suite.system)
 	suite.NoError(err)
