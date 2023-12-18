@@ -45,7 +45,7 @@ func (suite *LogRepositoryTestSuite) TearDownTest() {
 	suite.db.Close()
 }
 
-func (suite *LogRepositoryTestSuite) TestGivenAValidLog_WhenSavingTheLog_ShouldReceiveNil() {
+func (suite *LogRepositoryTestSuite) TestGivenAValidLog_WhenSavingTheLog_ShouldSaveTheLogCorrectly() {
 	logRepository := NewLogRepository(suite.db)
 	err := logRepository.Save(context.Background(), suite.log)
 	suite.NoError(err)
