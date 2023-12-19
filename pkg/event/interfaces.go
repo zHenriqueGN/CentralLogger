@@ -12,14 +12,14 @@ type EventInterface interface {
 	GetDateTime() time.Time
 }
 
-type EventHandlerInterface interface {
+type HandlerInterface interface {
 	Handle(event EventInterface, wg *sync.WaitGroup)
 }
 
-type EventDispatcherInterface interface {
-	Register(eventName string, handler EventHandlerInterface) error
+type DispatcherInterface interface {
+	Register(eventName string, handler HandlerInterface) error
 	Dispatch(event EventInterface) error
-	Remove(evenName string, handler EventHandlerInterface) error
-	Has(eventName string, handler EventHandlerInterface) bool
+	Remove(evenName string, handler HandlerInterface) error
+	Has(eventName string, handler HandlerInterface) bool
 	Clear()
 }
