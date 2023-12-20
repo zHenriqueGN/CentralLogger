@@ -4,7 +4,7 @@ import "time"
 
 type LogSaved struct {
 	Name    string
-	Payload string
+	Payload interface{}
 }
 
 func NewLogSaved(name string) *LogSaved {
@@ -17,14 +17,14 @@ func (e *LogSaved) GetName() string {
 	return e.Name
 }
 
-func (e *LogSaved) GetPayload() string {
+func (e *LogSaved) GetPayload() interface{} {
 	return e.Payload
 }
 
-func (e *LogSaved) SetPayload(payload string) {
+func (e *LogSaved) SetPayload(payload interface{}) {
 	e.Payload = payload
 }
 
-func (e *LogSaved) GetDateTime(name string) time.Time {
+func (e *LogSaved) GetDateTime() time.Time {
 	return time.Now()
 }
