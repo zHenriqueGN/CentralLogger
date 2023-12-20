@@ -23,10 +23,10 @@ func NewDispatcher() *Dispatcher {
 
 func (d *Dispatcher) Dispatch(event EventInterface) error {
 	if handlers, ok := d.handlers[event.GetName()]; ok {
-		var wg *sync.WaitGroup
+		var wg sync.WaitGroup
 		for _, handler := range handlers {
 			wg.Add(1)
-			go handler.Handle(event, wg)
+			go handler.Handle(event, &wg)
 		}
 		wg.Wait()
 		return nil
