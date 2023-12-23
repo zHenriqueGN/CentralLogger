@@ -66,6 +66,9 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 	}
 	r.LogSaved.SetPayload(output)
 	err = r.Dispatcher.Dispatch(r.LogSaved)
+	if err != nil {
+		return nil, err
+	}
 	return &output, nil
 }
 
