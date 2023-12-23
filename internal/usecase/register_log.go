@@ -6,6 +6,7 @@ import (
 
 	"github.com/zHenriqueGN/CentralLogger/internal/entity"
 	"github.com/zHenriqueGN/CentralLogger/internal/infra/repository"
+	"github.com/zHenriqueGN/CentralLogger/pkg/events"
 	"github.com/zHenriqueGN/UnitOfWork/uow"
 )
 
@@ -27,7 +28,9 @@ type RegisterLogUseCaseOutputDTO struct {
 }
 
 type RegisterLogUseCase struct {
-	Uow uow.UowInterface
+	Uow        uow.UowInterface
+	LogSaved   events.EventInterface
+	Dispatcher events.DispatcherInterface
 }
 
 func NewRegisterLogUseCase(uow uow.UowInterface) *RegisterLogUseCase {
@@ -39,11 +42,17 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 	if err != nil {
 		return nil, err
 	}
-	logRepository, err := r.getLogRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	err = logRepository.Save(log)
+	err = r.Uow.Do(ctx, func(uow uow.UowInterface) error {
+		logRepository, err := r.getLogRepository(ctx)
+		if err != nil {
+			return err
+		}
+		err = logRepository.Save(log)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +64,8 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 		Message:   log.Message,
 		TimeStamp: log.TimeStamp,
 	}
+	r.LogSaved.SetPayload(output)
+	err = r.Dispatcher.Dispatch(r.LogSaved)
 	return &output, nil
 }
 
