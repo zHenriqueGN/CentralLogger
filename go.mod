@@ -5,12 +5,14 @@ go 1.21.5
 require (
 	github.com/google/uuid v1.4.0
 	github.com/lib/pq v1.10.9
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/stretchr/testify v1.8.4
-	github.com/zHenriqueGN/UnitOfWork v0.0.0-20231205170726-4a46d541963f
+	github.com/zHenriqueGN/UnitOfWork v0.0.0-20231226225040-1d23728754bd
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
