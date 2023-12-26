@@ -22,8 +22,8 @@ github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/zHenriqueGN/UnitOfWork v0.0.0-20231205170726-4a46d541963f h1:UxnFzT/s6O18JWKAJiO6HUWvPqQuAR6Ae50GNtaaG/8=
-github.com/zHenriqueGN/UnitOfWork v0.0.0-20231205170726-4a46d541963f/go.mod h1:72nzAWJiD+UchWFoHgNbrZokVsZ1hWuttJO7wYxCpXA=
+github.com/zHenriqueGN/UnitOfWork v0.0.0-20231226225040-1d23728754bd h1:RGKiaBnNy/dNYNV0Yfyp59oABQsE40ygujYAJPCWrJA=
+github.com/zHenriqueGN/UnitOfWork v0.0.0-20231226225040-1d23728754bd/go.mod h1:72nzAWJiD+UchWFoHgNbrZokVsZ1hWuttJO7wYxCpXA=
 go.uber.org/goleak v1.2.1 h1:NBol2c7O1ZokfZ0LEU9K6Whx/KnwvepVetCUhtKja4A=
 go.uber.org/goleak v1.2.1/go.mod h1:qlT2yGI9QafXHhZZLxlSuNsMw3FFLxBr+tBRlmO1xH4=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

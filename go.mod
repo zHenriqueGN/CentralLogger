@@ -7,7 +7,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/stretchr/testify v1.8.4
-	github.com/zHenriqueGN/UnitOfWork v0.0.0-20231205170726-4a46d541963f
+	github.com/zHenriqueGN/UnitOfWork v0.0.0-20231226225040-1d23728754bd
 )
 
 require (

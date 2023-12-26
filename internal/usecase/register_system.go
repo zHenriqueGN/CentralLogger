@@ -37,11 +37,11 @@ func (r *RegisterSystemUseCase) Execute(ctx context.Context, input RegisterSyste
 	if err != nil {
 		return nil, err
 	}
-	err = r.Uow.Do(ctx, func(uow uow.UowInterface) error {
-		systemRepository, err := r.getSystemRepository(ctx)
-		if err != nil {
-			return err
-		}
+	systemRepository, err := r.getSystemRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = r.Uow.Do(ctx, func() error {
 		err = systemRepository.Create(system)
 		if err != nil {
 			return err

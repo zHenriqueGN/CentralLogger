@@ -42,11 +42,11 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 	if err != nil {
 		return nil, err
 	}
-	err = r.Uow.Do(ctx, func(uow uow.UowInterface) error {
-		logRepository, err := r.getLogRepository(ctx)
-		if err != nil {
-			return err
-		}
+	logRepository, err := r.getLogRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = r.Uow.Do(ctx, func() error {
 		err = logRepository.Save(log)
 		if err != nil {
 			return err
