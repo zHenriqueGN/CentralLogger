@@ -1,0 +1,24 @@
+syntax = "proto3";
+package pb;
+option go_package = "internal/infra/grpc/pb";
+
+message RegisterLogRequest {
+    string system_id = 1;
+    string level = 2;
+    string status = 3;
+    string message = 4;
+    string time_stamp = 5;
+}
+
+message RegisterLogResponse {
+    string id = 1;
+    string system_id = 2;
+    string level = 3;
+    string status = 4;
+    string message = 5;
+    string time_stamp = 6;
+}
+
+service LogService {
+    rpc RegisterLog(RegisterLogRequest) returns (RegisterLogResponse);
+}
