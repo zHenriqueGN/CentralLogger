@@ -34,20 +34,20 @@ func (d *Dispatcher) Dispatch(event EventInterface) error {
 	return ErrEventNotRegistered
 }
 
-func (d *Dispatcher) Register(event EventInterface, handler HandlerInterface) error {
-	if handlers, ok := d.handlers[event.GetName()]; ok {
+func (d *Dispatcher) Register(eventName string, handler HandlerInterface) error {
+	if handlers, ok := d.handlers[eventName]; ok {
 		for _, registeredHandler := range handlers {
 			if handler == registeredHandler {
 				return ErrHandlerAlreadyRegistered
 			}
 		}
 	}
-	d.handlers[event.GetName()] = append(d.handlers[event.GetName()], handler)
+	d.handlers[eventName] = append(d.handlers[eventName], handler)
 	return nil
 }
 
-func (d *Dispatcher) Has(event EventInterface, handler HandlerInterface) (bool, error) {
-	if handlers, ok := d.handlers[event.GetName()]; ok {
+func (d *Dispatcher) Has(eventName string, handler HandlerInterface) (bool, error) {
+	if handlers, ok := d.handlers[eventName]; ok {
 		for _, registeredHandler := range handlers {
 			if handler == registeredHandler {
 				return true, nil
@@ -58,11 +58,11 @@ func (d *Dispatcher) Has(event EventInterface, handler HandlerInterface) (bool, 
 	return false, ErrEventNotRegistered
 }
 
-func (d *Dispatcher) Remove(event EventInterface, handler HandlerInterface) error {
-	if handlers, ok := d.handlers[event.GetName()]; ok {
+func (d *Dispatcher) Remove(eventName string, handler HandlerInterface) error {
+	if handlers, ok := d.handlers[eventName]; ok {
 		for i, registeredHandler := range handlers {
 			if handler == registeredHandler {
-				d.handlers[event.GetName()] = append(handlers[:i], handlers[i+1:]...)
+				d.handlers[eventName] = append(handlers[:i], handlers[i+1:]...)
 				return nil
 			}
 		}

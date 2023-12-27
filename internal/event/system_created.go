@@ -7,9 +7,9 @@ type SystemCreated struct {
 	Payload interface{}
 }
 
-func NewSystemCreated(name string) *SystemCreated {
+func NewSystemCreated() *SystemCreated {
 	return &SystemCreated{
-		Name: name,
+		Name: "SystemCreated",
 	}
 }
 
@@ -21,7 +21,7 @@ func (s *SystemCreated) GetPayload() interface{} {
 	return s.Payload
 }
 
-func (s *SystemCreated) SetPayLoad(payload interface{}) {
+func (s *SystemCreated) SetPayload(payload interface{}) {
 	s.Payload = payload
 }
 

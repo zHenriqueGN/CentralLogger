@@ -7,9 +7,9 @@ type LogSaved struct {
 	Payload interface{}
 }
 
-func NewLogSaved(name string) *LogSaved {
+func NewLogSaved() *LogSaved {
 	return &LogSaved{
-		Name: name,
+		Name: "LogSaved",
 	}
 }
 
