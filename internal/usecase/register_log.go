@@ -33,8 +33,12 @@ type RegisterLogUseCase struct {
 	Dispatcher events.DispatcherInterface
 }
 
-func NewRegisterLogUseCase(uow uow.UowInterface) *RegisterLogUseCase {
-	return &RegisterLogUseCase{Uow: uow}
+func NewRegisterLogUseCase(uow uow.UowInterface, logSaved events.EventInterface, dispatcher events.DispatcherInterface) *RegisterLogUseCase {
+	return &RegisterLogUseCase{
+		Uow:        uow,
+		LogSaved:   logSaved,
+		Dispatcher: dispatcher,
+	}
 }
 
 func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCaseInputDTO) (*RegisterLogUseCaseOutputDTO, error) {
@@ -42,12 +46,12 @@ func (r *RegisterLogUseCase) Execute(ctx context.Context, input RegisterLogUseCa
 	if err != nil {
 		return nil, err
 	}
-	logRepository, err := r.getLogRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
 	err = r.Uow.Do(ctx, func() error {
-		err = logRepository.Save(log)
+		logRepository, err := r.getLogRepository(ctx)
+		if err != nil {
+			return err
+		}
+		err = logRepository.Save(ctx, log)
 		if err != nil {
 			return err
 		}
