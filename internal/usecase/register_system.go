@@ -28,8 +28,12 @@ type RegisterSystemUseCase struct {
 	Dispatcher    events.DispatcherInterface
 }
 
-func NewRegisterSystemUseCase(uow uow.UowInterface) *RegisterSystemUseCase {
-	return &RegisterSystemUseCase{Uow: uow}
+func NewRegisterSystemUseCase(uow uow.UowInterface, systemCreated events.EventInterface, dispatcher events.DispatcherInterface) *RegisterSystemUseCase {
+	return &RegisterSystemUseCase{
+		Uow:           uow,
+		SystemCreated: systemCreated,
+		Dispatcher:    dispatcher,
+	}
 }
 
 func (r *RegisterSystemUseCase) Execute(ctx context.Context, input RegisterSystemUseCaseInputDTO) (*RegisterSystemUseCaseOutputDTO, error) {
@@ -37,12 +41,12 @@ func (r *RegisterSystemUseCase) Execute(ctx context.Context, input RegisterSyste
 	if err != nil {
 		return nil, err
 	}
-	systemRepository, err := r.getSystemRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
 	err = r.Uow.Do(ctx, func() error {
-		err = systemRepository.Create(system)
+		systemRepository, err := r.getSystemRepository(ctx)
+		if err != nil {
+			return err
+		}
+		err = systemRepository.Create(ctx, system)
 		if err != nil {
 			return err
 		}

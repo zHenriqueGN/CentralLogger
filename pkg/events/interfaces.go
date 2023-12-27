@@ -20,6 +20,6 @@ type DispatcherInterface interface {
 	Register(eventName string, handler HandlerInterface) error
 	Dispatch(event EventInterface) error
 	Remove(evenName string, handler HandlerInterface) error
-	Has(eventName string, handler HandlerInterface) bool
+	Has(eventName string, handler HandlerInterface) (bool, error)
 	Clear()
 }

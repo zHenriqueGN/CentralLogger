@@ -68,27 +68,27 @@ func (suite *DispatcherTestSuite) SetupTest() {
 }
 
 func (suite *DispatcherTestSuite) TestGivenEqualHandlers_WhenRegisteringHandlers_ShouldReturnError() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers[suite.event1.GetName()], 1)
-	err = suite.dispatcher.Register(suite.event1, suite.handler1)
+	err = suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.ErrorIs(err, ErrHandlerAlreadyRegistered)
 }
 
 func (suite *DispatcherTestSuite) TestGivenEventsAndItsHandlers_WhenRegisteringHandlers_ShouldRegisterWithoutErrors() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers[suite.event1.GetName()], 1)
-	err = suite.dispatcher.Register(suite.event1, suite.handler2)
+	err = suite.dispatcher.Register(suite.event1.GetName(), suite.handler2)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers[suite.event1.GetName()], 2)
 	suite.Equal(suite.dispatcher.handlers[suite.event1.GetName()][0], suite.handler1)
 	suite.Equal(suite.dispatcher.handlers[suite.event1.GetName()][1], suite.handler2)
 
-	err = suite.dispatcher.Register(suite.event2, suite.handler1)
+	err = suite.dispatcher.Register(suite.event2.GetName(), suite.handler1)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers[suite.event2.GetName()], 1)
-	err = suite.dispatcher.Register(suite.event2, suite.handler2)
+	err = suite.dispatcher.Register(suite.event2.GetName(), suite.handler2)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers[suite.event2.GetName()], 2)
 	suite.Equal(suite.dispatcher.handlers[suite.event2.GetName()][0], suite.handler1)
@@ -96,53 +96,53 @@ func (suite *DispatcherTestSuite) TestGivenEventsAndItsHandlers_WhenRegisteringH
 }
 
 func (suite *DispatcherTestSuite) TestGivenAnEventNotRegistered_WhenRemovingAHandler_ShouldReturnError() {
-	err := suite.dispatcher.Remove(suite.event1, suite.handler1)
+	err := suite.dispatcher.Remove(suite.event1.GetName(), suite.handler1)
 	suite.ErrorIs(err, ErrEventNotRegistered)
 }
 
 func (suite *DispatcherTestSuite) TestGivenAnHandlerNotRegistered_WhenRemovingAHandler_ShouldReturnError() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
-	err = suite.dispatcher.Remove(suite.event1, suite.handler2)
+	err = suite.dispatcher.Remove(suite.event1.GetName(), suite.handler2)
 	suite.ErrorIs(err, ErrHandlerNotFound)
 }
 
 func (suite *DispatcherTestSuite) TestGivenExistentsEventAndHandler_WhenRemovingAHandler_ShouldReturnNil() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
-	err = suite.dispatcher.Register(suite.event1, suite.handler2)
+	err = suite.dispatcher.Register(suite.event1.GetName(), suite.handler2)
 	suite.Nil(err)
-	err = suite.dispatcher.Remove(suite.event1, suite.handler1)
+	err = suite.dispatcher.Remove(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers[suite.event1.GetName()], 1)
 }
 
 func (suite *DispatcherTestSuite) TestGivenAnEventNotRegistered_WhenUsingHas_ShouldReturnError() {
-	has, err := suite.dispatcher.Has(suite.event1, suite.handler1)
+	has, err := suite.dispatcher.Has(suite.event1.GetName(), suite.handler1)
 	suite.ErrorIs(err, ErrEventNotRegistered)
 	suite.False(has)
 }
 
 func (suite *DispatcherTestSuite) TestGivenAHandlerNotRegistered_WhenUsingHas_ShouldReturnFalse() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
-	has, err := suite.dispatcher.Has(suite.event1, suite.handler2)
+	has, err := suite.dispatcher.Has(suite.event1.GetName(), suite.handler2)
 	suite.Nil(err)
 	suite.False(has)
 }
 
 func (suite *DispatcherTestSuite) TestGivenAHandlerNotRegistered_WhenUsingHas_ShouldReturnTrue() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
-	has, err := suite.dispatcher.Has(suite.event1, suite.handler1)
+	has, err := suite.dispatcher.Has(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
 	suite.True(has)
 }
 
 func (suite *DispatcherTestSuite) TestGivenHandlersRegistered_WhenUsingClear_ShouldClearAllHandlers() {
-	err := suite.dispatcher.Register(suite.event1, suite.handler1)
+	err := suite.dispatcher.Register(suite.event1.GetName(), suite.handler1)
 	suite.Nil(err)
-	err = suite.dispatcher.Register(suite.event2, suite.handler2)
+	err = suite.dispatcher.Register(suite.event2.GetName(), suite.handler2)
 	suite.Nil(err)
 	suite.Len(suite.dispatcher.handlers, 2)
 	suite.dispatcher.Clear()
@@ -157,7 +157,7 @@ func (suite *DispatcherTestSuite) TestGivenANotRegisteredEvent_WhenUsingDispatch
 func (suite *DispatcherTestSuite) TestGivenARegisteredEvent_WhenUsingDispatch_ShoulDispatchTheEvent() {
 	handler := &MockHandler{}
 	handler.On("Handle", suite.event1)
-	err := suite.dispatcher.Register(suite.event1, handler)
+	err := suite.dispatcher.Register(suite.event1.GetName(), handler)
 	suite.Nil(err)
 	err = suite.dispatcher.Dispatch(suite.event1)
 	suite.Nil(err)

@@ -1,11 +1,15 @@
 package repository
 
-import "github.com/zHenriqueGN/CentralLogger/internal/entity"
+import (
+	"context"
+
+	"github.com/zHenriqueGN/CentralLogger/internal/entity"
+)
 
 type LogRepositoryInterface interface {
-	Save(log *entity.Log) error
+	Save(ctx context.Context, log *entity.Log) error
 }
 
 type SystemRepositoryInterface interface {
-	Create(system *entity.System) error
+	Create(ctx context.Context, system *entity.System) error
 }
