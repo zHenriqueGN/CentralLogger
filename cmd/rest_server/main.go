@@ -1,18 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net"
+	"net/http"
 
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	_ "github.com/lib/pq"
 	dependencyconfigs "github.com/zHenriqueGN/CentralLogger/cmd/dependency_configs"
 	"github.com/zHenriqueGN/CentralLogger/config"
-	"github.com/zHenriqueGN/CentralLogger/internal/infra/grpc/pb"
-	"github.com/zHenriqueGN/CentralLogger/internal/infra/grpc/service"
+	"github.com/zHenriqueGN/CentralLogger/internal/infra/rest/router"
 	"github.com/zHenriqueGN/CentralLogger/internal/usecase"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -48,24 +46,21 @@ func main() {
 		LogSaved:      registerEventsOutput.LogSaved,
 	})
 
-	grpcServer := configuregRPCServices(registerUseCasesOutput.RegisterSystemUseCase, registerUseCasesOutput.RegisterLogUseCase)
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", envVars.GRPCServerPort))
-	if err != nil {
-		log.Fatalf("error on listening grpc server address: %v", err)
-	}
-	fmt.Printf("starting gRPC server on: localhost:%s\n", envVars.GRPCServerPort)
-	err = grpcServer.Serve(lis)
-	if err != nil {
-		log.Fatalf("error on serving grpc server: %v", err)
-	}
+	r := configureRouter(registerUseCasesOutput.RegisterSystemUseCase, registerUseCasesOutput.RegisterLogUseCase)
+	http.ListenAndServe(":8080", r)
 }
 
-func configuregRPCServices(registerSystemUseCase *usecase.RegisterSystemUseCase, registerLogUseCase *usecase.RegisterLogUseCase) *grpc.Server {
-	registerSystemService := service.NewSystemService(registerSystemUseCase)
-	registerLogService := service.NewLogService(registerLogUseCase)
-	grpcServer := grpc.NewServer()
-	pb.RegisterSystemServiceServer(grpcServer, registerSystemService)
-	pb.RegisterLogServiceServer(grpcServer, registerLogService)
-	reflection.Register(grpcServer)
-	return grpcServer
+func configureRouter(registerSystemUseCase *usecase.RegisterSystemUseCase, registerLogUseCase *usecase.RegisterLogUseCase) chi.Router {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	systemRouter := router.NewSystemRouter(registerSystemUseCase)
+	r.Route("/systems", func(r chi.Router) {
+		r.MethodFunc(http.MethodPost, "/", systemRouter.Register)
+	})
+	logRouter := router.NewLogRouter(registerLogUseCase)
+	r.Route("/logs", func(r chi.Router) {
+		r.MethodFunc(http.MethodPost, "/", logRouter.Register)
+	})
+	return r
 }
