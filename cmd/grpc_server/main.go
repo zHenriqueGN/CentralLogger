@@ -1,22 +1,16 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net"
 
 	_ "github.com/lib/pq"
-	amqp "github.com/rabbitmq/amqp091-go"
+	dependencyconfigs "github.com/zHenriqueGN/CentralLogger/cmd/dependency_configs"
 	"github.com/zHenriqueGN/CentralLogger/config"
-	"github.com/zHenriqueGN/CentralLogger/internal/event"
-	"github.com/zHenriqueGN/CentralLogger/internal/event/handler"
 	"github.com/zHenriqueGN/CentralLogger/internal/infra/grpc/pb"
 	"github.com/zHenriqueGN/CentralLogger/internal/infra/grpc/service"
-	"github.com/zHenriqueGN/CentralLogger/internal/infra/repository/postgres"
 	"github.com/zHenriqueGN/CentralLogger/internal/usecase"
-	"github.com/zHenriqueGN/CentralLogger/pkg/events"
-	"github.com/zHenriqueGN/UnitOfWork/uow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -24,66 +18,54 @@ import (
 func main() {
 	envVars, err := config.LoadEnvVars()
 	if err != nil {
-		log.Fatalf("error on loading env vars: %w", err)
+		log.Fatalf("error on loading env vars: %v", err)
 	}
-	db, err := sql.Open(
-		"postgres",
-		fmt.Sprintf(
-			"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-			envVars.PostgresUser,
-			envVars.PostgresPassword,
-			envVars.PostgresHost,
-			envVars.PostgresPort,
-			envVars.PostgresDB,
-		),
-	)
-	rabbitMQConn, err := amqp.Dial(
-		fmt.Sprintf(
-			"amqp://%s:%s@%s:%s/",
-			envVars.RabbitMQUser,
-			envVars.RabbitMQPassword,
-			envVars.RabbitMQHost,
-			envVars.RabbitMQPort,
-		),
-	)
+
+	db, err := dependencyconfigs.ConnectToPostgres(envVars.PostgresUser, envVars.PostgresPassword, envVars.PostgresHost, envVars.PostgresPort, envVars.PostgresDB)
 	if err != nil {
-		log.Fatalf("error on connecting to rabbitmq: %w", err)
+		log.Fatalf("error when connecting to postgres: %v", err)
+	}
+	defer db.Close()
+
+	rabbitMQConn, err := dependencyconfigs.GetRabbitMQConn(envVars.RabbitMQUser, envVars.RabbitMQPassword, envVars.RabbitMQHost, envVars.RabbitMQPort)
+	if err != nil {
+		log.Fatalf("error when connecting to RabbitMQ: %v", err)
 	}
 	defer rabbitMQConn.Close()
-	rabbitMQChannel, err := rabbitMQConn.Channel()
+
+	rabbitMQChannel, err := dependencyconfigs.GetRabbitMQChannel(rabbitMQConn)
 	if err != nil {
-		log.Fatalf("error on opening rabbitmq channel: %w", err)
+		log.Fatalf("error when getting RabbitMQ channel: %v", err)
 	}
 	defer rabbitMQChannel.Close()
-	logSaved := event.NewLogSaved()
-	logSavedHandler := handler.NewLogSavedHandler(rabbitMQChannel)
-	systemCreated := event.NewSystemCreated()
-	systemCreatedHandler := handler.NewSystemCreatedHandler(rabbitMQChannel)
-	dispatcher := events.NewDispatcher()
-	dispatcher.Register(logSaved.GetName(), logSavedHandler)
-	dispatcher.Register(systemCreated.GetName(), systemCreatedHandler)
-	unitOfWork := uow.NewUnitOfWork(db)
-	unitOfWork.Register("LogRepository", func(dbtx uow.DBTX) interface{} {
-		return postgres.NewLogRepository(dbtx)
+
+	registerEventsOutput := dependencyconfigs.RegisterEvents(rabbitMQChannel)
+	unitOfWork := dependencyconfigs.CreateUnitOfWork(db)
+	registerUseCasesOutput := dependencyconfigs.RegisterUseCases(&dependencyconfigs.RegisterUseCasesInput{
+		UnitOfWork:    unitOfWork,
+		Dispatcher:    registerEventsOutput.Dispatcher,
+		SystemCreated: registerEventsOutput.SystemCreated,
+		LogSaved:      registerEventsOutput.LogSaved,
 	})
-	unitOfWork.Register("SystemRepository", func(dbtx uow.DBTX) interface{} {
-		return postgres.NewSystemRepository(dbtx)
-	})
-	registerLogUseCase := usecase.NewRegisterLogUseCase(unitOfWork, logSaved, dispatcher)
-	registerSystemUseCase := usecase.NewRegisterSystemUseCase(unitOfWork, systemCreated, dispatcher)
-	registerLogService := service.NewLogService(registerLogUseCase)
-	registerSystemService := service.NewSystemService(registerSystemUseCase)
-	grpcServer := grpc.NewServer()
-	pb.RegisterLogServiceServer(grpcServer, registerLogService)
-	pb.RegisterSystemServiceServer(grpcServer, registerSystemService)
-	reflection.Register(grpcServer)
+
+	grpcServer := configuregRPCServices(registerUseCasesOutput.RegisterSystemUseCase, registerUseCasesOutput.RegisterLogUseCase)
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", envVars.GRPCServerPort))
 	if err != nil {
-		log.Fatalf("error on listening grpc server address: %w", err)
+		log.Fatalf("error on listening grpc server address: %v", err)
 	}
 	fmt.Printf("starting gRPC server on: localhost:%s\n", envVars.GRPCServerPort)
 	err = grpcServer.Serve(lis)
 	if err != nil {
-		log.Fatalf("error on serving grpc server: %w", err)
+		log.Fatalf("error on serving grpc server: %v", err)
 	}
+}
+
+func configuregRPCServices(registerSystemUseCase *usecase.RegisterSystemUseCase, registerLogUseCase *usecase.RegisterLogUseCase) *grpc.Server {
+	registerSystemService := service.NewSystemService(registerSystemUseCase)
+	registerLogService := service.NewLogService(registerLogUseCase)
+	grpcServer := grpc.NewServer()
+	pb.RegisterSystemServiceServer(grpcServer, registerSystemService)
+	pb.RegisterLogServiceServer(grpcServer, registerLogService)
+	reflection.Register(grpcServer)
+	return grpcServer
 }
