@@ -47,7 +47,7 @@ func main() {
 	})
 
 	r := configureRouter(registerUseCasesOutput.RegisterSystemUseCase, registerUseCasesOutput.RegisterLogUseCase)
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(envVars.RESTServerPort, r)
 }
 
 func configureRouter(registerSystemUseCase *usecase.RegisterSystemUseCase, registerLogUseCase *usecase.RegisterLogUseCase) chi.Router {
