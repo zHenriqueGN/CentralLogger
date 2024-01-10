@@ -1,0 +1,39 @@
+type System {
+  id: ID!
+  name: String!
+  description: String!
+  version: String!
+  logs: [Log]!
+}
+
+type Log {
+  id: ID!
+  system_id: String!
+  level: String!
+  status: String!
+  message: String!
+  timestamp: String!
+}
+
+input RegisterSystem {
+  name: String!
+  description: String!
+  version: String!
+}
+
+input RegisterLog {
+  system_id: String!
+  level: String!
+  status: String!
+  message: String!
+  timestamp: String!
+}
+
+type Query {
+  getSystem(id: ID!): System!
+}
+
+type Mutation{
+  registerSystem(input: RegisterSystem!): System!
+  registerLog(input: RegisterLog!): Log!
+}

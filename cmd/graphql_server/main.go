@@ -4,13 +4,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/lib/pq"
 	dependencyconfigs "github.com/zHenriqueGN/CentralLogger/cmd/dependency_configs"
 	"github.com/zHenriqueGN/CentralLogger/config"
-	"github.com/zHenriqueGN/CentralLogger/internal/infra/rest/router"
-	"github.com/zHenriqueGN/CentralLogger/internal/usecase"
+	"github.com/zHenriqueGN/CentralLogger/internal/infra/graphql/graph"
 )
 
 func main() {
@@ -46,21 +45,20 @@ func main() {
 		LogSaved:      registerEventsOutput.LogSaved,
 	})
 
-	r := configureRouter(registerUseCasesOutput.RegisterSystemUseCase, registerUseCasesOutput.RegisterLogUseCase)
-	http.ListenAndServe(envVars.RESTServerPort, r)
-}
+	srv := handler.NewDefaultServer(
+		graph.NewExecutableSchema(
+			graph.Config{
+				Resolvers: &graph.Resolver{
+					RegisterSystemUseCase: registerUseCasesOutput.RegisterSystemUseCase,
+					RegisterLogUseCase:    registerUseCasesOutput.RegisterLogUseCase,
+				},
+			},
+		),
+	)
 
-func configureRouter(registerSystemUseCase *usecase.RegisterSystemUseCase, registerLogUseCase *usecase.RegisterLogUseCase) chi.Router {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	systemRouter := router.NewSystemRouter(registerSystemUseCase)
-	r.Route("/systems", func(r chi.Router) {
-		r.MethodFunc(http.MethodPost, "/", systemRouter.Register)
-	})
-	logRouter := router.NewLogRouter(registerLogUseCase)
-	r.Route("/logs", func(r chi.Router) {
-		r.MethodFunc(http.MethodPost, "/", logRouter.Register)
-	})
-	return r
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", srv)
+
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", envVars.GraphQLServerPort)
+	log.Fatal(http.ListenAndServe(":"+envVars.GraphQLServerPort, nil))
 }

@@ -30,7 +30,7 @@ func (h *LogSavedHandler) Handle(event events.EventInterface, wg *sync.WaitGroup
 
 	h.RabbitMQChannel.PublishWithContext(
 		context.Background(),
-		"amq.direct",
+		"logs",
 		"",
 		false,
 		false,
