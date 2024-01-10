@@ -30,7 +30,7 @@ func (h *SystemCreatedHandler) Handle(event events.EventInterface, wg *sync.Wait
 
 	h.RabbitMQChannel.PublishWithContext(
 		context.Background(),
-		"amq.direct",
+		"systems",
 		"",
 		false,
 		false,
